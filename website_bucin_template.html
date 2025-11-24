@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Website Bucin — Super Lengkap</title>
+  <style>
+    :root{
+      --accent:#ff2e63;
+      --accent-2:#ff9aa2;
+      --bg1:#fff0f6;
+      --bg2:#ffe6ef;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;
+      font-family:Inter, Poppins, system-ui, sans-serif;
+      background: linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:#3b1b2d;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    header{padding:28px 20px;text-align:center}
+    h1{margin:0;font-size:36px;color:var(--accent)}
+    p.lead{margin:8px 0 0;color:#7a2e4b}
+
+    .controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:18px}
+    .card{background:var(--glass);backdrop-filter: blur(6px);border-radius:12px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+
+    button.btn{border:none;background:var(--accent);color:white;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:600}
+    input[type=file]{display:none}
+    label.file-btn{cursor:pointer;padding:9px 12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-radius:10px}
+
+    /* layout */
+    .main{display:grid;grid-template-columns:1fr;gap:18px;padding:18px;max-width:1100px;margin:0 auto}
+
+    /* slideshow */
+    .slideshow{width:320px;margin:10px auto;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+    .slideshow img{width:100%;display:block}
+
+    /* popup surat */
+    #popupSurat{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:80}
+    #isiSurat{width:90%;max-width:520px;padding:22px;border-radius:12px;background:white;color:var(--accent);box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+    #isiSurat h2{margin-top:0}
+
+    /* gift modal */
+    #giftModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:90}
+    #giftCard{width:320px;background:linear-gradient(180deg,#fff,#ffeef6);padding:18px;border-radius:14px;text-align:center}
+
+    /* typed text */
+    .typed{font-size:18px;margin-top:6px;color:#7a2e4b}
+
+    /* countdown */
+    .countdown{display:flex;gap:8px;justify-content:center;margin-top:8px}
+    .countdown .num{background:white;padding:10px 12px;border-radius:8px;min-width:56px}
+
+    /* particle canvas */
+    #glitter{position:fixed;right:0;left:0;top:0;bottom:0;pointer-events:none;z-index:20}
+
+    /* footer */
+    footer{padding:18px;text-align:center;color:#6b3a4f}
+
+    /* responsive */
+    @media(min-width:900px){.main{grid-template-columns:380px 1fr}}
+  </style>
+</head>
+<body>
+  <canvas id="glitter"></canvas>
+  <header>
+    <h1>Hai Sayang ❤️</h1>
+    <p class="lead">Website bucin ini lengkap: musik, foto, animasi, surat, gift, countdown, dan lainnya — bisa kamu modifikasi langsung.</p>
+  </header>
+
+  <section class="controls">
+    <div class="card">
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="toggleMusicBtn">Play Musik</button>
+        <label class="file-btn" for="musicFile">Pilih Musik</label>
+        <input id="musicFile" type="file" accept="audio/*">
+        <button class="btn" id="muteBtn">Mute</button>
+      </div>
+      <div style="margin-top:8px;font-size:13px;color:#6b3a4f">Gunakan tombol "Pilih Musik" untuk meng-upload file mp3/ogg dari komputer/HP kamu. Musik akan disimpan sementara pada browser.</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:8px;align-items:center">
+        <label class="file-btn" for="photoFiles">Tambah Foto</label>
+        <input id="photoFiles" type="file" accept="image/*" multiple>
+        <button class="btn" id="clearPhotos">Hapus Semua Foto</button>
+      </div>
+      <div style="margin-top:8px;font-size:13px;color:#6b3a4f">Drag & drop juga didukung jika kamu membuka di browser desktop.</div>
+    </div>
+
+    <div class="card">
+      <button class="btn" id="openSurat">Buka Surat 💌</button>
+      <button class="btn" id="openGift">Kirim Gift 🎁</button>
+      <button class="btn" id="toggleGlitter">Toggle Glitter ✨</button>
+    </div>
+
+    <div class="card">
+      <div>Countdown (masukkan tanggal):</div>
+      <input type="date" id="dateTarget">
+      <div class="countdown" id="countdownArea">
+        <div class="num" id="d">00<br><small>Hari</small></div>
+        <div class="num" id="h">00<br><small>Jam</small></div>
+        <div class="num" id="m">00<br><small>Menit</small></div>
+        <div class="num" id="s">00<br><small>Detik</small></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <aside>
+      <div class="slideshow card" id="slideshowWrap">
+        <!-- images will be injected here -->
+        <div id="noPhotos" style="padding:24px;color:#7a2e4b">Belum ada foto. Tambah foto menggunakan tombol "Tambah Foto".</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:14px;text-align:center">
+        <div class="typed" id="typed">Ketik pesan manismu di sini...</div>
+        <div style="margin-top:8px;display:flex;gap:8px;justify-content:center">
+          <input id="typedInput" placeholder="Tulis pesan...">
+          <button class="btn" id="setTyped">Set</button>
+        </div>
+      </div>
+    </aside>
+
+    <section>
+      <div class="card" style="padding:18px;min-height:220px">
+        <h3 style="margin-top:0;color:var(--accent)">Preview & Kontrol</h3>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn" id="prevPhoto">⟨ Prev</button>
+          <button class="btn" id="nextPhoto">Next ⟩</button>
+          <button class="btn" id="fullscreen">Fullscreen</button>
+          <button class="btn" id="downloadPages">Download HTML</button>
+        </div>
+        <div style="margin-top:12px;color:#6b3a4f">Gunakan tombol navigasi untuk melihat foto, dan tombol download untuk menyimpan halaman ini sebagai file HTML di perangkatmu.</div>
+      </div>
+
+      <div class="card" style="margin-top:12px;padding:18px">
+        <h3 style="margin-top:0;color:var(--accent)">Pengaturan Animasi</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <label><input type="checkbox" id="heartsToggle" checked> Love jatuh</label>
+          <label><input type="checkbox" id="particlesToggle" checked> Partikel glitter</label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Surat PopUp -->
+  <div id="popupSurat" onclick="if(event.target===this) tutupSurat()">
+    <div id="isiSurat">
+      <h2>Untuk Kamu ❤️</h2>
+      <p id="suratText">Aku sayang banget sama kamu. Terima kasih sudah jadi alasan aku tersenyum setiap hari.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="btn" onclick="tutupSurat()">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gift Modal -->
+  <div id="giftModal" onclick="if(event.target===this) closeGift()">
+    <div id="giftCard">
+      <h3>Hadiah untukmu 🎁</h3>
+      <p>Ini hadiah virtual: sebuah bunga dan lagu cinta 🥰</p>
+      <div style="margin:12px 0"><img src="" id="giftImg" alt="gift" style="width:160px;border-radius:8px"></div>
+      <button class="btn" onclick="closeGift()">Terima</button>
+    </div>
+  </div>
+
+  <footer>
+    <small>Tip: simpan halaman setelah selesai (Download HTML). File musik dan foto di-load lokal — tidak diunggah ke server.</small>
+  </footer>
+
+  <script>
+    /* ----------------- Utilities ----------------- */
+    const $ = (sel)=>document.querySelector(sel);
+    const $all = (sel)=>Array.from(document.querySelectorAll(sel));
+
+    /* ----------------- Audio ----------------- */
+    const audio = new Audio(); audio.loop = true; audio.volume = 0.8;
+    let musicLoaded=false;
+    const toggleMusicBtn = $('#toggleMusicBtn');
+    const musicFile = $('#musicFile');
+    const muteBtn = $('#muteBtn');
+
+    toggleMusicBtn.addEventListener('click',()=>{
+      if(!musicLoaded){
+        // try to play default if no file
+        playDefault();
+      } else {
+        if(audio.paused) audio.play(); else audio.pause();
+        updateMusicButton();
+      }
+    });
+
+    function playDefault(){
+      // silent fallback: use data URI beep? keep paused
+      alert('Tidak ada file musik terpilih. Silakan pilih file menggunakan tombol "Pilih Musik".');
+    }
+
+    function updateMusicButton(){
+      toggleMusicBtn.textContent = audio.paused ? 'Play Musik' : 'Pause Musik';
+    }
+
+    musicFile.addEventListener('change',e=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const url = URL.createObjectURL(f);
+      audio.src = url;
+      audio.play(); musicLoaded=true; updateMusicButton();
+    });
+
+    muteBtn.addEventListener('click',()=>{
+      audio.muted = !audio.muted; muteBtn.textContent = audio.muted ? 'Unmute' : 'Mute';
+    });
+
+    /* ----------------- Photos & Slideshow ----------------- */
+    const photoFiles = $('#photoFiles');
+    const slideshowWrap = $('#slideshowWrap');
+    const noPhotos = $('#noPhotos');
+    let photos = []; // array of {src, name}
+    let currentIndex = 0;
+
+    function renderSlideshow(){
+      slideshowWrap.innerHTML = '';
+      if(!photos.length){ slideshowWrap.appendChild(noPhotos); return; }
+      const img = document.createElement('img'); img.src = photos[currentIndex].src; img.alt = photos[currentIndex].name;
+      slideshowWrap.appendChild(img);
+    }
+
+    photoFiles.addEventListener('change',async e=>{
+      const files = Array.from(e.target.files || []);
+      for(const f of files){
+        if(!f.type.startsWith('image/')) continue;
+        const url = URL.createObjectURL(f);
+        photos.push({src:url,name:f.name});
+      }
+      currentIndex = photos.length? Math.max(0,photos.length-1):0;
+      renderSlideshow();
+    });
+
+    $('#clearPhotos').addEventListener('click',()=>{ photos=[]; currentIndex=0; renderSlideshow(); });
+    $('#prevPhoto').addEventListener('click',()=>{ if(!photos.length) return; currentIndex=(currentIndex-1+photos.length)%photos.length; renderSlideshow(); });
+    $('#nextPhoto').addEventListener('click',()=>{ if(!photos.length) return; currentIndex=(currentIndex+1)%photos.length; renderSlideshow(); });
+
+    // drag & drop for desktop
+    ;(function enableDragDrop(){
+      const area = document.body;
+      area.addEventListener('dragover',e=>{ e.preventDefault(); area.style.opacity=0.95; });
+      area.addEventListener('dragleave',e=>{ area.style.opacity=1; });
+      area.addEventListener('drop',e=>{
+        e.preventDefault(); area.style.opacity=1;
+        const items = Array.from(e.dataTransfer.files || []);
+        const images = items.filter(f=>f.type && f.type.startsWith('image/'));
+        if(images.length) {
+          images.forEach(f=>{ photos.push({src:URL.createObjectURL(f),name:f.name}); });
+          renderSlideshow();
+        }
+        const aud = items.find(f=>f.type && f.type.startsWith('audio/'));
+        if(aud){ audio.src = URL.createObjectURL(aud); audio.play(); musicLoaded=true; updateMusicButton(); }
+      });
+    })();
+
+    /* ----------------- Typed message ----------------- */
+    const typed = $('#typed');
+    $('#setTyped').addEventListener('click',()=>{ const v=$('#typedInput').value; if(v) typed.textContent = v; });
+
+    /* ----------------- Surat popup ----------------- */
+    window.bukaSurat = ()=>{ $('#popupSurat').style.display='flex'; }
+    window.tutupSurat = ()=>{ $('#popupSurat').style.display='none'; }
+    $('#openSurat').addEventListener('click',bukaSurat);
+
+    /* ----------------- Gift ----------------- */
+    function openGift(){
+      // simple animated gift: set image to a heart image data uri or use first photo
+      const imgEl = $('#giftImg');
+      if(photos.length) imgEl.src = photos[currentIndex].src; else imgEl.src = '';
+      $('#giftModal').style.display='flex';
+    }
+    function closeGift(){ $('#giftModal').style.display='none'; }
+    window.openGift = openGift; window.closeGift = closeGift;
+    $('#openGift').addEventListener('click',openGift);
+
+    /* ----------------- Hearts falling (DOM) ----------------- */
+    let heartsEnabled = true;
+    const heartsToggle = $('#heartsToggle');
+    heartsToggle.addEventListener('change',e=>{ heartsEnabled = e.target.checked; });
+    function createHeart(){
+      if(!heartsEnabled) return;
+      const el = document.createElement('div');
+      el.style.position='fixed'; el.style.top='-30px';
+      el.style.zIndex = 25; el.style.pointerEvents='none';
+      const icons = ['❤️','💕','💗','💖','💘'];
+      el.textContent = icons[Math.floor(Math.random()*icons.length)];
+      el.style.left = Math.random()*100 + 'vw';
+      el.style.fontSize = (Math.random()*18+18)+'px';
+      el.style.opacity = Math.random()*0.6+0.4;
+      el.style.transform = 'translateY(0)';
+      document.body.appendChild(el);
+      const dur = (Math.random()*3+3)*1000;
+      el.animate([{transform:'translateY(0) rotate(0deg)'},{transform:'translateY(110vh) rotate(360deg)',opacity:0}],{duration:dur,iterations:1,easing:'linear'});
+      setTimeout(()=>el.remove(),dur+100);
+    }
+    setInterval(createHeart,400);
+
+    /* ----------------- Glitter particles (canvas) ----------------- */
+    const canvas = $('#glitter'); const ctx = canvas.getContext('2d');
+    let particles=[]; let particlesEnabled=true;
+    const particlesToggle = $('#particlesToggle'); particlesToggle.addEventListener('change',e=>{ particlesEnabled = e.target.checked; });
+    function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+    addEventListener('resize',resizeCanvas); resizeCanvas();
+
+    function spawnParticle(){ if(!particlesEnabled) return; particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()*0.6)+0.2, life:Math.random()*80+60, size:Math.random()*2+0.7}); }
+    for(let i=0;i<120;i++) spawnParticle();
+    function updateParticles(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let p of particles){ p.x+=p.vx; p.y+=p.vy; p.life--; if(p.life<0){ p.x=Math.random()*canvas.width; p.y=0; p.life=Math.random()*80+60; }
+        ctx.globalAlpha = Math.min(1, p.life/120);
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.fill();
+      } requestAnimationFrame(updateParticles);
+    }
+    updateParticles();
+
+    $('#toggleGlitter').addEventListener('click',()=>{ particlesEnabled = !particlesEnabled; $('#particlesToggle').checked = particlesEnabled; if(!particlesEnabled) ctx.clearRect(0,0,canvas.width,canvas.height); });
+
+    /* ----------------- Countdown ----------------- */
+    const dateTarget = $('#dateTarget'); const dEl = $('#d'),hEl=$('#h'),mEl=$('#m'),sEl=$('#s');
+    let targetDate = null; function updateCountdown(){ if(!targetDate) return; const now=new Date(); const diff = targetDate - now; if(diff<=0){ dEl.innerHTML='00<br><small>Hari</small>'; hEl.innerHTML='00<br><small>Jam</small>'; mEl.innerHTML='00<br><small>Menit</small>'; sEl.innerHTML='00<br><small>Detik</small>'; return; } const days=Math.floor(diff/86400000); const hrs=Math.floor((diff%86400000)/3600000); const mins=Math.floor((diff%3600000)/60000); const secs=Math.floor((diff%60000)/1000); dEl.innerHTML=String(days).padStart(2,'0')+"<br><small>Hari</small>"; hEl.innerHTML=String(hrs).padStart(2,'0')+"<br><small>Jam</small>"; mEl.innerHTML=String(mins).padStart(2,'0')+"<br><small>Menit</small>"; sEl.innerHTML=String(secs).padStart(2,'0')+"<br><small>Detik</small>"; }
+    setInterval(updateCountdown,1000);
+    dateTarget.addEventListener('change',e=>{ if(e.target.value){ targetDate = new Date(e.target.value+'T00:00:00'); }});
+
+    /* ----------------- Fullscreen ----------------- */
+    $('#fullscreen').addEventListener('click',()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); });
+
+    /* ----------------- Download HTML ----------------- */
+    $('#downloadPages').addEventListener('click',()=>{
+      // create a blob of current document's HTML and download
+      const doctype = '<!doctype html>
+';
+      const html = doctype + document.documentElement.outerHTML;
+      const blob = new Blob([html],{type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download = 'website-bucin.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    /* ----------------- Save/restore state in localStorage (photos not persisted) ----------------- */
+    window.addEventListener('beforeunload',()=>{
+      try{ localStorage.setItem('bucin_typed', typed.textContent); localStorage.setItem('bucin_target', dateTarget.value||''); localStorage.setItem('bucin_hearts', heartsEnabled); localStorage.setItem('bucin_particles', particlesEnabled); }catch(e){}
+    });
+    window.addEventListener('DOMContentLoaded',()=>{
+      try{ const t=localStorage.getItem('bucin_typed'); if(t) typed.textContent=t; const dt=localStorage.getItem('bucin_target'); if(dt){ dateTarget.value=dt; targetDate=new Date(dt+'T00:00:00'); } const h=localStorage.getItem('bucin_hearts'); if(h!=='null'&&h!==null) { heartsEnabled = (h==='true'); $('#heartsToggle').checked = heartsEnabled; } const p=localStorage.getItem('bucin_particles'); if(p!=='null'&&p!==null){ particlesEnabled = (p==='true'); $('#particlesToggle').checked = particlesEnabled; } }catch(e){}
+    });
+
+    /* ----------------- Keyboard shortcuts (fun) ----------------- */
+    addEventListener('keydown',e=>{
+      if(e.key===' '){ e.preventDefault(); if(audio.paused) audio.play(); else audio.pause(); updateMusicButton(); }
+      if(e.key==='ArrowRight') $('#nextPhoto').click();
+      if(e.key==='ArrowLeft') $('#prevPhoto').click();
+    });
+
+    /* initial render */
+    renderSlideshow();
+
+  </script>
+</body>
+</html>
